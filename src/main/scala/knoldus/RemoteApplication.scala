@@ -15,11 +15,12 @@ object RemoteApplication extends App {
   val customConf = ConfigFactory.parseString(configString)
   val remoteSystem = ActorSystem("RemoteApplication", ConfigFactory.load(customConf))
   val remoteActorRef = remoteSystem.actorOf(Props[RemoteActor], "remote")
-
-  Thread.sleep(10000)
+  val scanner = new Scanner(System.in)
+  println("Waiting for message from Local")
 
   while (true) {
-    val input = Console.in.readLine()
+
+    val input = scanner.nextLine()
     originalSender ! Get(input)
   }
 
@@ -29,8 +30,10 @@ class RemoteActor extends Actor {
 
   def receive = {
     case msg: Send =>
-      println(msg.message)
+      println("------------------------------------------------------")
+      println("Message Received from Local:" + msg.message)
       RemoteApplication.originalSender = sender
+      println("------------------------------------------------------")
   }
 
 }

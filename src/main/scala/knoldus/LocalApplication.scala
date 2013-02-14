@@ -5,6 +5,7 @@ import akka.actor.ActorSystem
 import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
+import java.util.Scanner
 
 object LocalApplication extends App {
 
@@ -19,10 +20,15 @@ object LocalApplication extends App {
   val system = ActorSystem("Remote", ConfigFactory.load(customConf))
   val remoteActorReference = system.actorFor("akka://RemoteApplication@" + "127.0.0.1" + ":" + 2559 + "/user/remote")
   val local = system.actorOf(Props(new LocalActor(remoteActorReference)))
+  val scanner = new Scanner(System.in)
 
-  while(true){
-  val input = Console.in.readLine()
-  local ! Send(input)
+  println("Send message to Remote")
+
+  while (true) {
+
+    val input = scanner.nextLine
+    local ! Send(input)
+
   }
 }
 
@@ -32,7 +38,9 @@ class LocalActor(remote: ActorRef) extends Actor {
       //      println("Sending message to " + remote)
       remote ! msg
     case msg: Get =>
-      println(msg.message)
+      println("----------------------------------------------------------")
+      println("Message Received from Remote :" + msg.message)
+      println("----------------------------------------------------------")
   }
 
 }
